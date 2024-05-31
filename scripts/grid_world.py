@@ -49,12 +49,7 @@ class GridWorld:
             next_state = (row, max(col - 1, 0))
         else:
             raise ValueError("Invalid action. Action should be in [0, 1, 2, 3].")
-
-        new_row, new_col = next_state
-        if new_row > 4:
-            a = 2   
-        if new_col > 4:
-            a = 2     
+   
         # Check if next state is an obstacle
         if next_state in self.obstacles:
             reward = -1  # Penalty for hitting an obstacle
@@ -66,7 +61,7 @@ class GridWorld:
             if next_state in self.goals:
                 reward = 1
                 done = True
-                print("Goal reached!")
+                print(f"Goal reached! agent pos: {self.agent_position}")
 
             if next_state in self.fake_goals:
                 reward = 0.5

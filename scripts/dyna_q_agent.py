@@ -3,7 +3,16 @@ import random
 from grid_world import GridWorld
 
 class DynaQAgent:
-    def __init__(self, env: GridWorld, alpha=0.1, gamma=0.9, epsilon=0.9, planning_steps=10):
+    def __init__(
+            self,
+            env: GridWorld,
+            alpha=0.1,
+            gamma=0.9,
+            epsilon=0.9,
+            planning_steps=10, 
+            q_table=None, 
+            model=None
+        ):
         """
         Initialize the Dyna-Q agent.
         
@@ -19,12 +28,22 @@ class DynaQAgent:
         self.gamma = gamma
         self.epsilon = epsilon
         self.planning_steps = planning_steps
-        self.q_table = np.zeros((env.grid_size[0], env.grid_size[1], 4))  # Initialize Q-table
-        self.model = {}  # Initialize the model of the environment
+
+        if q_table is not None: 
+            self.q_table = q_table
+        else:
+            self.q_table = np.zeros((env.grid_size[0], env.grid_size[1], 4))
+
+        if model is not None:
+            self.model = model
+        else:
+            self.model = {} 
 
         self.trajectory = []
 
         self.state = env.agent_position
+
+        self.required_episodes = 0
 
     def choose_action(self, state):
         """
@@ -93,50 +112,37 @@ class DynaQAgent:
         state = self.env.agent_position
         done = False
 
+        self.trajectory.append(state)
         for episode in range(num_episodes):
             action = self.choose_action(state)
             next_state, reward, done = self.env.step(action)
-            self.trajectory.append(state)
+            self.trajectory.append(next_state)
             self.state = state
-            
-            self.learn(state, action, reward, next_state)
-            self.planning()  # Perform planning steps
-            state = next_state
-        
+
             if episode % 100 == 0:
                 print(f"Episode {episode} completed")
 
             if done:
                 break
 
-    def evaluate(self, num_episodes):
-        """
-        Evaluate the agent's performance.
+            self.learn(state, action, reward, next_state)
+            self.planning()  # Perform planning steps
+            state = next_state
         
-        Parameters:
-        - num_episodes: Number of episodes to evaluate the agent.
-        
-        Returns:
-        - average_reward: Average reward per episode.
-        """
-        total_reward = 0
-        
-        for _ in range(num_episodes):
-            state = self.env.reset()
-            done = False
-            episode_reward = 0
-            
-            while not done:
-                row, col = state
-                action = np.argmax(self.q_table[row, col, :])
-                next_state, reward, done = self.env.step(action)
-                episode_reward += reward
-                state = next_state
-            
-            total_reward += episode_reward
-        
-        average_reward = total_reward / num_episodes
-        return average_reward
+
+    def test(self, num_episodes):
+        state = self.env.agent_position
+
+        for episode in range(num_episodes):
+            action = self.choose_action(state)
+            next_state, reward, done = self.env.step(action)
+            self.trajectory.append(next_state)
+            state = next_state
+
+            if done:
+                self.required_episodes = episode
+                break
+
 
 
 
