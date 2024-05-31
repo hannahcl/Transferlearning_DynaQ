@@ -119,9 +119,6 @@ class DynaQAgent:
             self.trajectory.append(next_state)
             self.state = state
 
-            if episode % 100 == 0:
-                print(f"Episode {episode} completed")
-
             if done:
                 break
 

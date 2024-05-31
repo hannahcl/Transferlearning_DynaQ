@@ -61,7 +61,7 @@ class GridWorld:
             if next_state in self.goals:
                 reward = 1
                 done = True
-                print(f"Goal reached! agent pos: {self.agent_position}")
+                # print(f"Goal reached!")
 
             if next_state in self.fake_goals:
                 reward = 0.5
