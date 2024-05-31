@@ -66,7 +66,7 @@ def run_all():
     best_train_model = None
 
     env = create_env()
-    print('Train from scratch')
+    print('Train from scratch.')
     for train in range(train_n_times):
         env.reset()
         train_agent = DynaQAgent(env)
@@ -82,7 +82,18 @@ def run_all():
     print(f'Average train val: {avg_train/train_n_times}')
     avg_train = 0
 
-    print('Train with trained model.')
+    print('Test the agent by giving it the learned q value function.')
+    for test in range(test_n_times):
+        env.reset()
+        test_agent = DynaQAgent(env, q_table=best_train_q, model=None)
+        test_agent.train(num_episodes=max_episodes)
+
+        # print(f'test val: {len(test_agent.trajectory)} for episode {test+1}')
+        avg_test += len(test_agent.trajectory)
+    print(f'Average test val: {avg_test/test_n_times}')
+    avg_test = 0
+
+    print('Test the agent by giving it the learned q value function and the model.')
     for test in range(test_n_times):
         env.reset()
         test_agent = DynaQAgent(env, q_table=best_train_q, model=best_train_model)
@@ -93,20 +104,22 @@ def run_all():
     print(f'Average test val: {avg_test/test_n_times}')
     avg_test = 0
 
-    print('Now we move the goal and see if the agent can adapt faster using the learned model.')
+    print('Now we move the goal and remove obstacles and see if the agent can adapt faster using the learned model.')
     env.goals = [(0, 7)]
+    env.obstacles = []
 
-    print('Train from scratch')
-    for train in range(train_n_times):
+    print('Test the agent by giving it the learned q value function.')
+    for test in range(test_n_times):
         env.reset()
-        train_agent = DynaQAgent(env)
-        train_agent.train(num_episodes=max_episodes)
+        test_agent = DynaQAgent(env, q_table=best_train_q, model=None)
+        test_agent.train(num_episodes=max_episodes)
 
-        # print(f'train val: {len(train_agent.trajectory)} for episode {train+1}')
-        avg_train += len(train_agent.trajectory)
-    print(f'Average train val: {avg_train/train_n_times}')
+        # print(f'test val: {len(test_agent.trajectory)} for episode {test+1}')
+        avg_test += len(test_agent.trajectory)
+    print(f'Average test val: {avg_test/test_n_times}')
+    avg_test = 0
 
-    print('Train with frist trained model.')    
+    print('Test the agent by giving it the learned q value function and the model.')
     for test in range(test_n_times):
         env.reset()
         test_agent = DynaQAgent(env, q_table=best_train_q, model=best_train_model)
@@ -115,6 +128,7 @@ def run_all():
         # print(f'test val: {len(test_agent.trajectory)} for episode {test+1}')
         avg_test += len(test_agent.trajectory)
     print(f'Average test val: {avg_test/test_n_times}')
+    avg_test = 0
 
 if __name__ == "__main__":
     run_all()
