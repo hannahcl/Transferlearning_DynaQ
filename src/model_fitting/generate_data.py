@@ -1,5 +1,4 @@
 import numpy as np
-from nptyping import NDArray, Shape, Float
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 
